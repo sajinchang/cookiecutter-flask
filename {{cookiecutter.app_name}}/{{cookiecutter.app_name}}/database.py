@@ -2,8 +2,11 @@
 """Database module, including the SQLAlchemy database object and DB-related utilities."""
 from typing import Optional, Type, TypeVar
 
+import sqlalchemy as sa
+
+from {{cookiecutter.app_name}}.extensions import db
+
 from .compat import basestring
-from .extensions import db
 
 T = TypeVar("T", bound="PkModel")
 
@@ -42,6 +45,15 @@ class CRUDMixin(object):
         if commit:
             return db.session.commit()
         return
+    
+    def keys(self):
+        return [key for key in self.__table__.columns]
+
+    def to_dict(self):
+        d = {}
+        for c in self.__table__.c:
+            d[c.name] = getattr(self, c.name)
+        return d
 
 
 class Model(CRUDMixin, db.Model):
@@ -54,7 +66,20 @@ class PkModel(Model):
     """Base model class that includes CRUD convenience methods, plus adds a 'primary key' column named ``id``."""
 
     __abstract__ = True
-    id = Column(db.Integer, primary_key=True)
+    id = Column(sa.Integer, primary_key=True)
+    created_at = Column(
+        sa.DateTime(timezone=True),
+        server_default=sa.func.now(),
+        comment="创建时间",
+    )
+    updated_at = Column(
+        sa.DateTime(timezone=True),
+        onupdate=sa.func.now(),
+        server_default=sa.func.now(),
+        comment="创建时间",
+    )
+
+    state = Column(sa.Boolean, server_default="1", comment="是否可用, True: 可用; False: 不可用")
 
     @classmethod
     def get_by_id(cls: Type[T], record_id) -> Optional[T]:
@@ -65,7 +90,9 @@ class PkModel(Model):
                 isinstance(record_id, (int, float)),
             )
         ):
-            return cls.query.get(int(record_id))
+            return db.session.get(cls, record_id)
+
+            # return cls.query.get(int(record_id))
         return None
 
 

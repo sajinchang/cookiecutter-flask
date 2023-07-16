@@ -10,6 +10,9 @@ from .models import User
 class RegisterForm(FlaskForm):
     """Register form."""
 
+    class Meta:
+        csrf = False
+
     username = StringField(
         "Username", validators=[DataRequired(), Length(min=3, max=25)]
     )
@@ -43,3 +46,15 @@ class RegisterForm(FlaskForm):
             self.email.errors.append("Email already registered")
             return False
         return True
+
+
+class LoginForm(FlaskForm):
+    class Meta:
+        csrf = False
+
+    username = StringField(
+        "Username", validators=[DataRequired(), Length(min=3, max=25)]
+    )
+    password = PasswordField(
+        "Password", validators=[DataRequired(), Length(min=6, max=40)]
+    )

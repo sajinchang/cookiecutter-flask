@@ -15,7 +15,7 @@ class Role(PkModel):
     __tablename__ = "roles"
     name = Column(db.String(80), unique=True, nullable=False)
     user_id = reference_col("users", nullable=True)
-    user = relationship("User", backref="roles")
+    user = relationship("User", back_populates="roles")
 
     def __init__(self, name, **kwargs):
         """Create instance."""
@@ -39,6 +39,8 @@ class User(UserMixin, PkModel):
     active = Column(db.Boolean(), default=False)
     is_admin = Column(db.Boolean(), default=False)
 
+    roles = relationship("Role", back_populates="user")
+
     @hybrid_property
     def password(self):
         """Hashed password."""
@@ -47,7 +49,7 @@ class User(UserMixin, PkModel):
     @password.setter
     def password(self, value):
         """Set password."""
-        self._password = bcrypt.generate_password_hash(value)
+        self._password = bcrypt.generate_password_hash(value, rounds=len(value))
 
     def check_password(self, value):
         """Check password."""

@@ -70,27 +70,11 @@ interactions: List[columbo.Interaction] = [
         "Provide a short description for the project.",
         default="A flasky app.",
     ),
-    columbo.Confirm(
-        "use_pipenv",
-        "Should this project use pipenv?",
-        default=False,
-    ),
     columbo.Choice(
         "python_version",
         "Which version of Python will this application use?",
         options=["3.11", "3.10", "3.9", "3.8"],
         default="3.11",
-    ),
-    columbo.Choice(
-        "node_version",
-        "Which version of Node will this application use?",
-        options=["20", "18"],
-        default="20",
-    ),
-    columbo.Confirm(
-        "use_heroku",
-        "Will this project be deployed using heroku?",
-        default=False,
     ),
 ]
 

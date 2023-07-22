@@ -8,7 +8,7 @@ Werkzeug==2.3.6
 # Database
 Flask-SQLAlchemy==3.0.5
 PyMySQL==1.1.0
-SQLAlchemy==2.0.18
+SQLAlchemy==2.0.19
 
 # cors
 Flask-Cors==4.0.0

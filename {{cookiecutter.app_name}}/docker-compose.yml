@@ -1,56 +1,95 @@
-version: "3.6"
+x-app-image: &{{cookiecutter.app_name}}-image {{cookiecutter.app_name}}:${TAG:-latest}
+x-app-user: &{{cookiecutter.app_name}}-user sid
+x-app-depends-on: &{{cookiecutter.app_name}}-depends-on
+  - db
+  - redis
+x-app-volumes: &{{cookiecutter.app_name}}-volumes
+  # - ./docker:/app/docker
+  # - ./superset:/app/superset
+  # - ./superset-frontend:/app/superset-frontend
+  - app_home:/app/
+  # - ./tests:/app/tests
 
-x-build-args: &build_args
-  INSTALL_PYTHON_VERSION: "{{cookiecutter.python_version}}"
-
-x-default-volumes: &default_volumes
-  volumes:
-    - ./:/app
-    - node-modules:/app/node_modules
-    - ./dev.db:/tmp/dev.db
-
+version: "3.8"
 services:
-  flask-dev:
-    build:
-      context: .
-      target: development
-      args:
-        <<: *build_args
-    image: "{{cookiecutter.app_name}}-development"
+  redis:
+    image: redis:7
+    container_name: {{cookiecutter.app_name}}_cache
+    restart: unless-stopped
     ports:
-      - "8080:5000"
-      - "2992:2992"
-    <<: *default_volumes
+      - "127.0.0.1:6379:16379"
+    volumes:
+      - redis:/data
 
-  flask-prod:
-    build:
-      context: .
-      target: production
-      args:
-        <<: *build_args
-    image: "{{cookiecutter.app_name}}-production"
+  db:
+    env_file: docker/.env
+    image: mysql:latest
+    container_name: {{cookiecutter.app_name}}_db
+    restart: unless-stopped
     ports:
-      - "8080:5000"
-    environment:
-      FLASK_ENV: production
-      FLASK_DEBUG: 0
-      LOG_LEVEL: info
-      GUNICORN_WORKERS: 4
-    <<: *default_volumes
+      - "127.0.0.1:3306:13306"
+    volumes:
+      - db_home:/var/lib/mysql
 
-  manage:
-    build:
-      context: .
-      target: development
-      args:
-        <<: *build_args
-    environment:
-      FLASK_ENV: production
-      FLASK_DEBUG: 0
-    image: "{{cookiecutter.app_name}}-manage"
-    stdin_open: true
-    tty: true
-    <<: *default_volumes
+  {{cookiecutter.app_name}}:
+    env_file: docker/.env
+    image: *{{cookiecutter.app_name}}-image
+    container_name: {{cookiecutter.app_name}}_app
+    ENTRYPOINT: ["/bin/bash", "/app/bin/service.sh"]
+    restart: unless-stopped
+    ports:
+      - ${BIND_PORT}:${BIND_PORT}
+    user: *{{cookiecutter.app_name}}-user
+    depends_on: *{{cookiecutter.app_name}}-depends-on
+    volumes: *{{cookiecutter.app_name}}-volumes
+    # environment:
+    #   CYPRESS_CONFIG: "${CYPRESS_CONFIG}"
+
+  {{cookiecutter.app_name}}-worker:
+    image: *{{cookiecutter.app_name}}-image
+    container_name: {{cookiecutter.app_name}}_worker
+    ENTRYPOINT: ["/bin/bash", "/app/bin/celery.sh", "worker"]
+    env_file: docker/.env
+    restart: unless-stopped
+    depends_on: *{{cookiecutter.app_name}}-depends-on
+    user: *{{cookiecutter.app_name}}-user
+    volumes: *{{cookiecutter.app_name}}-volumes
+    healthcheck:
+      test: ["CMD-SHELL", "celery inspect ping -A {{cookiecutter.app_name}}.tasks.celery_app:app -d celery@$$HOSTNAME"]
+    # Bump memory limit if pr
+    # mem_limit: 2038m
+    # mem_reservation: 128M
+
+  {{cookiecutter.app_name}}-worker-beat:
+    image: *{{cookiecutter.app_name}}-image
+    container_name: {{cookiecutter.app_name}}_worker_beat
+    ENTRYPOINT: ["/bin/bash", "/app/bin/celery.sh", "beat"]
+    env_file: docker/.env
+    restart: unless-stopped
+    depends_on: *{{cookiecutter.app_name}}-depends-on
+    user: *{{cookiecutter.app_name}}-user
+    volumes: *{{cookiecutter.app_name}}-volumes
+    healthcheck:
+      disable: true
+
+  {{cookiecutter.app_name}}-flower-web:
+    image: *{{cookiecutter.app_name}}-image
+    container_name: {{cookiecutter.app_name}}_flower_web
+    ENTRYPOINT: ["/bin/bash", "/app/bin/celery.sh", "flower"]
+    env_file: docker/.env
+    restart: unless-stopped
+    depends_on: *{{cookiecutter.app_name}}-depends-on
+    user: *{{cookiecutter.app_name}}-user
+    volumes: *{{cookiecutter.app_name}}-volumes
+    ports:
+      - 5555:5555
+    healthcheck:
+      disable: true
 
 volumes:
-  node-modules:
+  app_home:
+    external: false
+  db_home:
+    external: false
+  redis:
+    external: false

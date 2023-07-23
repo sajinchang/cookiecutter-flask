@@ -7,6 +7,7 @@ import json
 
 
 from {{cookiecutter.app_name}}.apps.user.models import User
+from {{cookiecutter.app_name}}.initialization.exception import CODE
 
 from .factories import UserFactory
 
@@ -33,6 +34,7 @@ class TestLoggingIn:
         )
 
         assert res.status_code == 200
+        assert res.json.get("code") == CODE.OK
         assert res.json.get("error") is None
 
     def test_sees_alert_on_log_out(self, user, testapp):
@@ -41,6 +43,7 @@ class TestLoggingIn:
         res = testapp.post("/api/user/logout")
 
         assert res.status_code == 200
+        assert res.json.get("code") == 0
         assert res.json.get("error") is None
 
     def test_sees_error_message_if_password_is_incorrect(self, user, testapp):
@@ -58,6 +61,7 @@ class TestLoggingIn:
 
         # assert res.status_code == 200
         assert res.json.get("error") is not None
+        assert res.json.get("code") == CODE.INVALID_USERNAME_PASSWORD
         assert "username or password invalid" in res.json.get("error")
 
     def test_sees_error_message_if_username_doesnt_exist(self, user, testapp):
@@ -74,6 +78,7 @@ class TestLoggingIn:
         )
 
         assert res.json.get("error") is not None
+        assert res.json.get("code") == CODE.INVALID_USERNAME_PASSWORD
         assert "username or password invalid" in res.json.get("error")
 
 
@@ -96,6 +101,7 @@ class TestRegistering:
             "/api/user/register", params=json.dumps(data), content_type=content_type
         )
         assert res.status_code == 200
+        assert res.json.get("code") == CODE.OK
         # A new user was created
         assert len(User.query.all()) == old_count + 1
 
@@ -115,6 +121,8 @@ class TestRegistering:
         )
         assert "error" in res.json
         error_infos = res.json.get("error").get("confirm")
+        assert res.json.get("code") == CODE.REQUEST_INCORRECT_DATA
+
         assert "Passwords must match" in error_infos
         # assert res.status_code == 200
 
@@ -136,5 +144,6 @@ class TestRegistering:
         )
         assert res.status_code == 200
         assert "error" in res.json
+        assert res.json.get("code") == CODE.REQUEST_INCORRECT_DATA
         error_infos = res.json.get("error").get("username")
         assert "Username already registered" in error_infos

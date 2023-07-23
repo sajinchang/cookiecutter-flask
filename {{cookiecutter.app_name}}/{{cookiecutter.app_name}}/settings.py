@@ -40,9 +40,7 @@ DEBUG_TB_INTERCEPT_REDIRECTS = False
 # CACHE_TYPE = "SimpleCache"  # Can be "MemcachedCache", "RedisCache", etc.
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-
 SECRET_KEY = "S8r5V0$kj*`>}%CRx(lNf<e9hMgOQz':/[4UcWG."
-DEBUG = ENV == "development"
 
 DATABASE_DIALECT = get_env_variable("DATABASE_DIALECT", default="mysql+pymysql")
 DATABASE_USER = get_env_variable("DATABASE_USER", "root")

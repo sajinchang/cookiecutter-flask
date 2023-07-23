@@ -8,10 +8,12 @@ import datetime
 import decimal
 import uuid
 
+from flask import jsonify
 from flask.json.provider import DefaultJSONProvider
 from sqlalchemy.engine.result import ScalarResult
 
 from {{cookiecutter.app_name}}.database import PkModel
+from {{cookiecutter.app_name}}.initialization.exception import CODE
 
 
 class JsonEncoder(DefaultJSONProvider):
@@ -44,3 +46,8 @@ class JsonEncoder(DefaultJSONProvider):
             return tuple(item for item in obj)
         else:
             return super().default(obj)
+
+
+def json_response(data=None, code=CODE.OK, error=None):
+
+    return jsonify(locals())

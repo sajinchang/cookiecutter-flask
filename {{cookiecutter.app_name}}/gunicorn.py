@@ -3,8 +3,7 @@
 
 import os
 
-# from flaskapp import settings
-LOG_DIR = os.getenv("LOG_DIR", os.path.join(os.path.expanduser("~"), "logs", "flaskapp"))
+LOG_DIR = os.getenv("LOG_DIR", os.path.join(os.path.expanduser("~"), "logs", "{{cookiecutter.app_name}}"))
 os.makedirs(LOG_DIR, exist_ok=True)
 
 
@@ -15,7 +14,7 @@ class GunicornConfig(object):
     # 指定每个工作者的线程数
     threads = 2
     # 监听内网端口5000
-    bind = "0.0.0.0:5001"
+    bind = "0.0.0.0:{}".format(os.getenv("BIND_PORT", 5000))
     # 设置守护进程,将进程交给supervisor管理
     daemon = "false"
     # 工作模式协程
@@ -97,7 +96,7 @@ workers = GUNICORN_CONFIG.workers or 2
 # # 指定每个工作者的线程数
 threads = GUNICORN_CONFIG.threads or 2
 # # 监听内网端口5000
-bind = GUNICORN_CONFIG.bind or "0.0.0.0:5001"
+bind = GUNICORN_CONFIG.bind or "0.0.0.0:8080"
 # # 设置守护进程,将进程交给supervisor管理
 daemon = GUNICORN_CONFIG.daemon or False
 # # 工作模式协程

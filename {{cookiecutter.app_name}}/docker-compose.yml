@@ -35,7 +35,7 @@ services:
     env_file: docker/.env
     image: *{{cookiecutter.app_name}}-image
     container_name: {{cookiecutter.app_name}}_app
-    ENTRYPOINT: ["/bin/bash", "/app/bin/service.sh"]
+    entrypoint: ["/bin/bash", "/app/bin/service.sh"]
     restart: unless-stopped
     ports:
       - ${BIND_PORT}:${BIND_PORT}
@@ -48,7 +48,7 @@ services:
   {{cookiecutter.app_name}}-worker:
     image: *{{cookiecutter.app_name}}-image
     container_name: {{cookiecutter.app_name}}_worker
-    ENTRYPOINT: ["/bin/bash", "/app/bin/celery.sh", "worker"]
+    entrypoint: ["/bin/bash", "/app/bin/celery.sh", "worker"]
     env_file: docker/.env
     restart: unless-stopped
     depends_on: *{{cookiecutter.app_name}}-depends-on
@@ -63,7 +63,7 @@ services:
   {{cookiecutter.app_name}}-worker-beat:
     image: *{{cookiecutter.app_name}}-image
     container_name: {{cookiecutter.app_name}}_worker_beat
-    ENTRYPOINT: ["/bin/bash", "/app/bin/celery.sh", "beat"]
+    entrypoint: ["/bin/bash", "/app/bin/celery.sh", "beat"]
     env_file: docker/.env
     restart: unless-stopped
     depends_on: *{{cookiecutter.app_name}}-depends-on
@@ -75,7 +75,7 @@ services:
   {{cookiecutter.app_name}}-flower-web:
     image: *{{cookiecutter.app_name}}-image
     container_name: {{cookiecutter.app_name}}_flower_web
-    ENTRYPOINT: ["/bin/bash", "/app/bin/celery.sh", "flower"]
+    entrypoint: ["/bin/bash", "/app/bin/celery.sh", "flower"]
     env_file: docker/.env
     restart: unless-stopped
     depends_on: *{{cookiecutter.app_name}}-depends-on

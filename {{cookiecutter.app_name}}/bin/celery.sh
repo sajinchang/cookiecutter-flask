@@ -13,6 +13,7 @@ LOG_DIR="${HOME}/logs/${PROJECT_NAME}"
 case "${name}" in
 worker|-w|-W)
     # celery  multi start -A "${PROJECT_NAME}.tasks.celery_app:app" worker -fair \
+    test -e "${LOG_DIR}/celert-worker.pid" && rm -f "${LOG_DIR}/celert-worker.pid"
     celery \
         -A "${PROJECT_NAME}.tasks.celery_app:app" worker \
         -fair \
@@ -24,6 +25,7 @@ worker|-w|-W)
         # -n, --hostname HOSTNAME         Set custom hostname (e.g., 'w1@%%h').
     ;;
 beat|-b|-B)
+    test -e "${LOG_DIR}/celert-beat.pid" && rm -f "${LOG_DIR}/celert-beat.pid"
     celery \
         -A "${PROJECT_NAME}.tasks.celery_app:app" beat \
         -l INFO \

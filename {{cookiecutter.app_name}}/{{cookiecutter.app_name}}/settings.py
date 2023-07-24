@@ -40,15 +40,14 @@ DEBUG_TB_INTERCEPT_REDIRECTS = False
 # CACHE_TYPE = "SimpleCache"  # Can be "MemcachedCache", "RedisCache", etc.
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-SECRET_KEY = "S8r5V0$kj*`>}%CRx(lNf<e9hMgOQz':/[4UcWG."
 
 DATABASE_DIALECT = get_env_variable("DATABASE_DIALECT", default="mysql+pymysql")
 DATABASE_USER = get_env_variable("DATABASE_USER", "root")
 DATABASE_PASSWORD = get_env_variable("DATABASE_PASSWORD", "123456")
 DATABASE_HOST = get_env_variable("DATABASE_HOST", "localhost")
 DATABASE_PORT = get_env_variable("DATABASE_PORT", "3306")
-DATABASE_DB = get_env_variable("DATABASE_DB", "alarm")
-CELERY_DB = get_env_variable("CELERY_DB", "alarm_celery")
+DATABASE_DB = get_env_variable("DATABASE_DB", "{{cookiecutter.app_name}}")
+CELERY_DB = get_env_variable("CELERY_DB", "{{cookiecutter.app_name}}")
 
 # The SQLAlchemy connection string.
 SQLALCHEMY_DATABASE_URI = "%s://%s:%s@%s:%s/%s" % (

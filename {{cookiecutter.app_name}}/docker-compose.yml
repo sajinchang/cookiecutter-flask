@@ -1,13 +1,20 @@
 x-app-image: &{{cookiecutter.app_name}}-image {{cookiecutter.app_name}}:${TAG:-latest}
-x-app-user: &{{cookiecutter.app_name}}-user sid
+x-app-user: &{{cookiecutter.app_name}}-user root
 x-app-depends-on: &{{cookiecutter.app_name}}-depends-on
   - db
   - redis
+x-app-all-depends-on: &{{cookiecutter.app_name}}-all-depends-on
+  - db
+  - redis
+  - {{cookiecutter.app_name}}
+  - {{cookiecutter.app_name}}-worker
+  - {{cookiecutter.app_name}}-worker-beat
 x-app-volumes: &{{cookiecutter.app_name}}-volumes
   # - ./docker:/app/docker
   # - ./superset:/app/superset
   # - ./superset-frontend:/app/superset-frontend
   - app_home:/app/
+  - logs:/root/logs/{{cookiecutter.app_name}}
   # - ./tests:/app/tests
 
 version: "3.8"
@@ -20,9 +27,11 @@ services:
       - "127.0.0.1:6379:16379"
     volumes:
       - redis:/data
+    networks:
+      - net
 
   db:
-    env_file: docker/.env
+    env_file: docker/docker.env
     image: mysql:latest
     container_name: {{cookiecutter.app_name}}_db
     restart: unless-stopped
@@ -30,9 +39,11 @@ services:
       - "127.0.0.1:3306:13306"
     volumes:
       - db_home:/var/lib/mysql
+    networks:
+      - net
 
   {{cookiecutter.app_name}}:
-    env_file: docker/.env
+    env_file: docker/docker.env
     image: *{{cookiecutter.app_name}}-image
     container_name: {{cookiecutter.app_name}}_app
     entrypoint: ["/bin/bash", "/app/bin/service.sh"]
@@ -42,6 +53,10 @@ services:
     user: *{{cookiecutter.app_name}}-user
     depends_on: *{{cookiecutter.app_name}}-depends-on
     volumes: *{{cookiecutter.app_name}}-volumes
+    networks:
+      - net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsL http://localhost:${BIND_PORT} > /dev/null"]
     # environment:
     #   CYPRESS_CONFIG: "${CYPRESS_CONFIG}"
 
@@ -49,13 +64,15 @@ services:
     image: *{{cookiecutter.app_name}}-image
     container_name: {{cookiecutter.app_name}}_worker
     entrypoint: ["/bin/bash", "/app/bin/celery.sh", "worker"]
-    env_file: docker/.env
+    env_file: docker/docker.env
     restart: unless-stopped
     depends_on: *{{cookiecutter.app_name}}-depends-on
     user: *{{cookiecutter.app_name}}-user
     volumes: *{{cookiecutter.app_name}}-volumes
+    networks:
+      - net
     healthcheck:
-      test: ["CMD-SHELL", "celery inspect ping -A {{cookiecutter.app_name}}.tasks.celery_app:app -d celery@$$HOSTNAME"]
+      test: ["CMD-SHELL", "celery -A {{cookiecutter.app_name}}.tasks.celery_app:app inspect ping -d celery@$$HOSTNAME"]
     # Bump memory limit if pr
     # mem_limit: 2038m
     # mem_reservation: 128M
@@ -64,11 +81,13 @@ services:
     image: *{{cookiecutter.app_name}}-image
     container_name: {{cookiecutter.app_name}}_worker_beat
     entrypoint: ["/bin/bash", "/app/bin/celery.sh", "beat"]
-    env_file: docker/.env
+    env_file: docker/docker.env
     restart: unless-stopped
     depends_on: *{{cookiecutter.app_name}}-depends-on
     user: *{{cookiecutter.app_name}}-user
     volumes: *{{cookiecutter.app_name}}-volumes
+    networks:
+      - net
     healthcheck:
       disable: true
 
@@ -76,11 +95,13 @@ services:
     image: *{{cookiecutter.app_name}}-image
     container_name: {{cookiecutter.app_name}}_flower_web
     entrypoint: ["/bin/bash", "/app/bin/celery.sh", "flower"]
-    env_file: docker/.env
+    env_file: docker/docker.env
     restart: unless-stopped
-    depends_on: *{{cookiecutter.app_name}}-depends-on
+    depends_on: *{{cookiecutter.app_name}}-all-depends-on
     user: *{{cookiecutter.app_name}}-user
     volumes: *{{cookiecutter.app_name}}-volumes
+    networks:
+      - net
     ports:
       - 5555:5555
     healthcheck:
@@ -93,3 +114,14 @@ volumes:
     external: false
   redis:
     external: false
+  logs:
+    external: false
+
+
+networks:
+  net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.250.0/24

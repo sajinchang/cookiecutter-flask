@@ -7,13 +7,11 @@ FROM python:${INSTALL_PYTHON_VERSION}-slim-buster as production
 
 WORKDIR /app
 
-RUN useradd -m sid
-RUN chown -R sid:sid /app
-USER sid
-ENV PATH="/home/sid/.local/bin:${PATH}"
-
+USER root
+ENV PATH="/root/.local/bin:${PATH}"
 COPY requirements requirements
-RUN pip install --no-cache --user -r requirements/prod.txt
+RUN pip install --upgrade pip
+RUN pip install --no-cache -r requirements/prod.txt  --no-warn-script-location
 
 COPY . .
 

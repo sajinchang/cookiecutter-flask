@@ -4,11 +4,17 @@ x-app-depends-on: &{{cookiecutter.app_name}}-depends-on
   - db
   - redis
 x-app-all-depends-on: &{{cookiecutter.app_name}}-all-depends-on
-  - db
-  - redis
-  - {{cookiecutter.app_name}}
-  - {{cookiecutter.app_name}}-worker
-  - {{cookiecutter.app_name}}-worker-beat
+  db:
+    condition: service_started
+  redis:
+    condition: service_started
+  {{cookiecutter.app_name}}:
+    condition: service_healthy
+  {{cookiecutter.app_name}}-worker:
+    condition: service_healthy
+  {{cookiecutter.app_name}}-worker-beat:
+    condition: service_started
+
 x-app-volumes: &{{cookiecutter.app_name}}-volumes
   # - ./docker:/app/docker
   # - ./superset:/app/superset

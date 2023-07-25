@@ -74,3 +74,30 @@ class TestUser:
         """Check __repr__ output for User."""
         user = User(username="foo", email="foo@bar.com")
         assert user.__repr__() == "<User('foo')>"
+
+    def test_get_or_create(self):
+        user, is_created = User.get_or_create(username="foo-1", email="foo-1@bar.com")
+
+        assert is_created is True
+
+        new_user, is_created = User.get_or_create(
+            username="foo-1", email="foo-1@bar.com"
+        )
+        assert new_user == user
+        assert is_created is False
+
+    def test_create_or_update(self):
+        user, is_created = User.update_or_create(
+            username="foo-1", email="foo-1@bar.com", defaults={"first_name": "F"}
+        )
+        assert user.username == "foo-1"
+        assert is_created is True
+        assert user.first_name == "F"
+
+        new_user, is_created = User.update_or_create(
+            username="foo-1", email="foo-1@bar.com", defaults={"first_name": "L"}
+        )
+        assert user.username == "foo-1"
+        assert is_created is False
+        assert user.first_name == "L"
+        assert new_user == user

@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 """Database module, including the SQLAlchemy database object and DB-related utilities."""
+from importlib.metadata import version
 from typing import Optional, Type, TypeVar
 
 import sqlalchemy as sa
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
+from sqlalchemy.orm.exc import NoResultFound
 
 from {{cookiecutter.app_name}}.extensions import db
 
@@ -15,7 +19,88 @@ Column = db.Column
 relationship = db.relationship
 
 
-class CRUDMixin(object):
+class ExtendMixin(object):
+    @staticmethod
+    def _extract_model_params(defaults, **kwargs):
+        defaults = defaults or {}
+        ret = {}
+        ret.update(kwargs)
+        ret.update(defaults)
+        return ret
+
+    @classmethod
+    def _create_object_from_params(cls, session, lookup, params, lock=False):
+        session = session or db.session
+        obj = cls(**params)
+        session.add(obj)
+        try:
+            with session.begin_nested():
+                session.flush()
+        except IntegrityError:
+            session.rollback()
+            query = session.query(cls).filter_by(**lookup)
+            if lock:
+                query = query.with_for_update()
+            try:
+                obj = query.one()
+            except NoResultFound:
+                raise
+            else:
+                return obj, False
+        else:
+            return obj, True
+
+    @classmethod
+    def get_or_create(
+        cls, session: Session = None, defaults: Optional[dict] = None, **kwargs
+    ):
+        """
+        get_or_create _summary_
+
+        _extended_summary_
+
+        Args:
+            defaults: setattr if created. Defaults to None.
+            kwargs: select args
+
+        Returns:
+            _description_
+        """
+        session = session or db.session
+
+        try:
+            stmt = sa.select(cls).where(
+                *[getattr(cls, k) == v for k, v in kwargs.items()]
+            )
+            obj = session.execute(stmt).scalar_one()
+            return obj, False
+
+        except NoResultFound:
+            params = cls._extract_model_params(defaults, **kwargs)
+            return cls._create_object_from_params(session, kwargs, params)
+
+    @classmethod
+    def update_or_create(cls, session:Session=None, defaults=None, **kwargs):
+        session = session or db.session
+        defaults = defaults or {}
+        with session.begin_nested():
+            try:
+                obj = session.query(cls).with_for_update().filter_by(**kwargs).one()
+            except NoResultFound:
+                params = cls._extract_model_params(defaults, **kwargs)
+                obj, created = cls._create_object_from_params(
+                    session, kwargs, params, lock=True
+                )
+                if created:
+                    return obj, created
+            for k, v in defaults.items():
+                setattr(obj, k, v)
+            session.add(obj)
+            session.flush()
+        return obj, False
+
+
+class CRUDMixin(ExtendMixin):
     """Mixin that adds convenience methods for CRUD (create, read, update, delete) operations."""
 
     @classmethod
@@ -45,7 +130,7 @@ class CRUDMixin(object):
         if commit:
             return db.session.commit()
         return
-    
+
     def keys(self):
         return [key for key in self.__table__.columns]
 

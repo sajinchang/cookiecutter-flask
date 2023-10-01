@@ -1,18 +1,19 @@
 # -*- coding: utf-8 -*-
 """ urls """
 
-from flask import Flask
+from flask import Flask, Blueprint
 
 from {{cookiecutter.app_name}}.apps.user import views as user_views
 from {{cookiecutter.app_name}}.public import views as public_views
 
 
 def make_urls(flask_app: Flask):
-    def add_url(url:str, view):
-        flask_app.add_url_rule(url, view_func=view)
+    def add_url(url:str, view, blue_print:Blueprint):
+        blue_print.add_url_rule(url, view_func=view)
 
-    add_url("/", view=public_views.IndexView.as_view("index"))
-    add_url("/api/user/login", view=user_views.LoginView.as_view("user_login"))
-    add_url("/api/user/register", view=user_views.RegisterView.as_view("user_register"))
-    add_url("/api/user/logout", view=user_views.LogoutView.as_view("user_logout"))
+    api_blue = Blueprint("api", __name__, url_prefix="/api")
+    add_url("/", public_views.IndexView.as_view("index"), blue_print=api_blue)
+    add_url("/api/user/login", user_views.LoginView.as_view("user_login"), blue_print=api_blue)
+    add_url("/api/user/register", user_views.RegisterView.as_view("user_register"), blue_print=api_blue)
+    add_url("/api/user/logout", user_views.LogoutView.as_view("user_logout"), blue_print=api_blue)
     

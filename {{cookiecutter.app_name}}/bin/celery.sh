@@ -36,7 +36,8 @@ beat|-b|-B)
     ;;
 
 flower|-web)
-    celery  -A "${PROJECT_NAME}.tasks.celery_app:app" flower
+    # celery  -A "${PROJECT_NAME}.tasks.celery_app:app" flower
+    nohup celery  -A "${PROJECT_NAME}.tasks.celery_app:app" flower > "${LOG_DIR}/flower.log" 2>&1 &
     ;;
 *)
     echo "usage:"

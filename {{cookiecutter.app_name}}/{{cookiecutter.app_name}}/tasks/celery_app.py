@@ -14,6 +14,8 @@ from celery.signals import worker_process_init
 from {{cookiecutter.app_name}}.app import create_app
 from {{cookiecutter.app_name}}.extensions import celery_app, db, set_logger
 
+from . import task
+
 flask_app = create_app()
 
 app = celery_app

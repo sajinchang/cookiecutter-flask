@@ -111,7 +111,7 @@ class CeleryConfig(object):
         #     "schedule": crontab(minute=10, hour=0),
         # },
         "add": {
-            "task": "tasks.task.add_together",
+            "task": "add_together",
             "schedule": crontab(minute=0, hour=0),
         },
     }

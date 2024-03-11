@@ -48,6 +48,6 @@ class JsonEncoder(DefaultJSONProvider):
             return super().default(obj)
 
 
-def json_response(data=None, code=CODE.OK, error=None):
+def json_response(data=None, code=CODE.OK.code, error=None):
 
     return jsonify(locals())

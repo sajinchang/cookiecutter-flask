@@ -59,6 +59,9 @@ SQLALCHEMY_DATABASE_URI = "%s://%s:%s@%s:%s/%s" % (
     DATABASE_DB,
 )
 
+SQLALCHEMY_ENGINE_OPTIONS = {"pool_size": 20, "pool_recycle": 600, "pool_pre_ping": True,
+                              "isolation_level": "READ COMMITTED"}
+
 REDIS_HOST = get_env_variable("REDIS_HOST", "localhost")
 REDIS_PORT = get_env_variable("REDIS_PORT", "6379")
 REDIS_CELERY_DB = get_env_variable("REDIS_CELERY_DB", "0")
@@ -72,7 +75,8 @@ CACHE_REDIS_DB = REDIS_RESULTS_DB
 
 
 LOG_DIR = get_env_variable(
-    "LOG_DIR", os.path.join(os.path.expanduser("~"), "logs", "{{cookiecutter.app_name}}")
+    "LOG_DIR",
+    os.path.join(os.path.expanduser("~"), "logs", "{{cookiecutter.app_name}}"),
 )
 os.makedirs(LOG_DIR, exist_ok=True)
 

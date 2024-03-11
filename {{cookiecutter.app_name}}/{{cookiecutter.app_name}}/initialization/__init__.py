@@ -18,14 +18,17 @@ from {{cookiecutter.app_name}}.extensions import (
     cache,
     celery_app,
     db,
-    login_manager,
     debug_toolbar,
     migrate,
     set_logger,
+    jwt_manager
 )
 from .urls import make_urls
 
-
+def close_request_session(response):
+    # 解决mysql server gone away
+    db.session.remove()
+    return response
 class FlaskAppInitializer(object):  # pylint: disable=too-many-public-methods
     def __init__(self, app) -> None:
         super().__init__()
@@ -100,9 +103,10 @@ class FlaskAppInitializer(object):  # pylint: disable=too-many-public-methods
         cache.init_app(self.flask_app)
         debug_toolbar.init_app(self.flask_app)
         bcrypt.init_app(self.flask_app)
-        login_manager.init_app(self.flask_app)
+        jwt_manager.init_app(self.flask_app)
 
     def configure_middleware(self):
+        self.flask_app.after_request(close_request_session)
         if self.config["ENABLE_CORS"]:
             from flask_cors import CORS
 

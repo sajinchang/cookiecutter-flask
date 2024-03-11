@@ -3,7 +3,7 @@
 from factory import Sequence
 from factory.alchemy import SQLAlchemyModelFactory
 
-from {{cookiecutter.app_name}}.apps.user.models import User
+from {{cookiecutter.app_name}}.apps.models import User
 from {{cookiecutter.app_name}}.database import db
 
 

@@ -8,9 +8,9 @@ import celery
 from flask_bcrypt import Bcrypt
 from flask_caching import Cache
 from flask_debugtoolbar import DebugToolbarExtension
-from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
+from flask_jwt_extended import JWTManager
 
 
 def set_logger(logger, filename: str, stream: bool, formatted: bool):
@@ -38,10 +38,10 @@ def set_logger(logger, filename: str, stream: bool, formatted: bool):
 
 
 APP_DIR = os.path.join(os.path.dirname(__file__), os.path.pardir)
-login_manager = LoginManager()
 celery_app = celery.Celery()
 db = SQLAlchemy()
 migrate = Migrate()
 cache = Cache()
 bcrypt = Bcrypt()
 debug_toolbar = DebugToolbarExtension()
+jwt_manager = JWTManager()

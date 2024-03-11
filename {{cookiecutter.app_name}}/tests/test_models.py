@@ -4,7 +4,7 @@ import datetime as dt
 
 import pytest
 
-from {{cookiecutter.app_name}}.apps.user.models import Role, User
+from {{cookiecutter.app_name}}.apps.models import Role, User
 
 from .factories import UserFactory
 
@@ -41,7 +41,6 @@ class TestUser:
         assert bool(user.username)
         assert bool(user.email)
         assert bool(user.created_at)
-        assert user.is_admin is False
         assert user.active is True
         assert user.check_password("myprecious")
 

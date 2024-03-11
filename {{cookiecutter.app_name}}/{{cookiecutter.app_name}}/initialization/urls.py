@@ -13,7 +13,8 @@ def make_urls(flask_app: Flask):
 
     api_blue = Blueprint("api", __name__, url_prefix="/api")
     add_url("/", public_views.IndexView.as_view("index"), blue_print=api_blue)
-    add_url("/api/user/login", user_views.LoginView.as_view("user_login"), blue_print=api_blue)
-    add_url("/api/user/register", user_views.RegisterView.as_view("user_register"), blue_print=api_blue)
-    add_url("/api/user/logout", user_views.LogoutView.as_view("user_logout"), blue_print=api_blue)
+    add_url("/user/login", user_views.LoginView.as_view("user_login"), blue_print=api_blue)
+    add_url("/user/register", user_views.RegisterView.as_view("user_register"), blue_print=api_blue)
+    add_url("/user/logout", user_views.LogoutView.as_view("user_logout"), blue_print=api_blue)
+    flask_app.register_blueprint(api_blue)
     

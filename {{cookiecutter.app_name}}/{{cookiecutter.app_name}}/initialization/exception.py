@@ -8,7 +8,24 @@ class FlaskAppBaseException(Exception):
 
 
 class CODE:
-    OK=0
-    INVALID_USERNAME_PASSWORD = 10001
+    OK = 0
 
-    REQUEST_INCORRECT_DATA = 10002
+    class OK:
+        code = "0"
+        message = "ok"
+
+    class PERMISSION_DENIED:
+        code = 10003
+        message = "PERMISSION_DENIED"
+
+    class INVALID_USERNAME_PASSWORD:
+        code = 10001
+        message = "INVALID_USERNAME_PASSWORD"
+
+    class REQUEST_INCORRECT_DATA:
+        code = 10002
+        message = "REQUEST_INCORRECT_DATA"
+
+    class DUPLICATE_USERNAME:
+        code = 10003
+        message = "DUPLICATE_USERNAME"

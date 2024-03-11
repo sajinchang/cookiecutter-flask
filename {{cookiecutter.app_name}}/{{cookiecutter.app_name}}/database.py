@@ -34,8 +34,8 @@ class ExtendMixin(object):
         obj = cls(**params)
         session.add(obj)
         try:
-            with session.begin_nested():
-                session.flush()
+            session.commit()
+            session.flush()
         except IntegrityError:
             session.rollback()
             query = session.query(cls).filter_by(**lookup)

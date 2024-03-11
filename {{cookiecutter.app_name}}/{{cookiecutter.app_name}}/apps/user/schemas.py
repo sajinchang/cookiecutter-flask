@@ -7,7 +7,7 @@ __author__ = "SamSa"
 from marshmallow.fields import DateTime
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, fields
 
-from . import models
+from {{cookiecutter.app_name}}.apps import models
 
 
 class RoleSchema(SQLAlchemyAutoSchema):

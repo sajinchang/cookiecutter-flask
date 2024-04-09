@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 """Database module, including the SQLAlchemy database object and DB-related utilities."""
 from importlib.metadata import version
-from typing import Optional, Type, TypeVar
+from typing import Optional, Type, TypeVar, Any
 
 import sqlalchemy as sa
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Mapped, Session, mapped_column
+from sqlalchemy.orm.properties import MappedColumn
 from sqlalchemy.orm.exc import NoResultFound
 
 from {{cookiecutter.app_name}}.extensions import db
@@ -13,6 +14,7 @@ from {{cookiecutter.app_name}}.extensions import db
 from .compat import basestring
 
 T = TypeVar("T", bound="PkModel")
+TModel = TypeVar("TModel", bound="Model")
 
 # Alias common SQLAlchemy names
 Column = db.Column
@@ -141,10 +143,17 @@ class CRUDMixin(ExtendMixin):
         return d
 
 
-class Model(CRUDMixin, db.Model):
+class Model(CRUDMixin, db.Model):  # type: ignore
     """Base model class that includes CRUD convenience methods."""
 
     __abstract__ = True
+
+    @classmethod
+    def get(cls, **kwds) -> TModel | None:
+        cond = [getattr(cls, k) == v for k, v in kwds.items()]
+        stmt = sa.select(cls).where(*cond)
+
+        return db.session.execute(stmt).scalar_one_or_none()
 
 
 class PkModel(Model):
@@ -182,8 +191,7 @@ class PkModel(Model):
 
 
 def reference_col(
-    tablename, nullable=False, pk_name="id", foreign_key_kwargs=None, column_kwargs=None
-):
+    tablename, nullable=False, pk_name="id", foreign_key_kwargs=None, column_kwargs=None)->MappedColumn[Any]:
     """Column that adds primary key foreign key reference.
 
     Usage: ::
@@ -194,7 +202,7 @@ def reference_col(
     foreign_key_kwargs = foreign_key_kwargs or {}
     column_kwargs = column_kwargs or {}
 
-    return Column(
+    return mapped_column(
         db.ForeignKey(f"{tablename}.{pk_name}", **foreign_key_kwargs),
         nullable=nullable,
         **column_kwargs,

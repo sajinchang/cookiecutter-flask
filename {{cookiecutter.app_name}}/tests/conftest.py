@@ -5,7 +5,6 @@ import logging
 
 import pytest
 from webtest import TestApp
-
 from {{cookiecutter.app_name}}.app import create_app
 from {{cookiecutter.app_name}}.database import db as _db
 

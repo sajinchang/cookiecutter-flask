@@ -1,14 +1,19 @@
 # -*- coding: utf-8 -*-
-"""User models."""
-import datetime as dt
+"""models."""
 
-from sqlalchemy.ext.hybrid import hybrid_property
+
 import sqlalchemy as sa
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import Mapped, mapped_column
 
-from {{cookiecutter.app_name}}.database import Column, PkModel, db, reference_col, relationship
+from {{cookiecutter.app_name}}.database import (
+    Column,
+    PkModel,
+    db,
+    reference_col,
+    relationship,
+)
 from {{cookiecutter.app_name}}.extensions import bcrypt
-
-
 
 third_role_users = db.Table(
     "third_role_users",
@@ -30,6 +35,12 @@ class Role(PkModel):
         index=True,
     )
 
+    users: Mapped[List["User"]] = relationship(
+        back_populates="roles",
+        secondary=third_role_users,
+        uselist=True
+    ) # type: ignore
+
     def __init__(self, name, **kwargs):
         """Create instance."""
         super().__init__(name=name, **kwargs)
@@ -43,19 +54,23 @@ class User(PkModel):
     """A user of the app."""
 
     __tablename__ = "user"
-    username = Column(sa.String(80), unique=True, nullable=False)
-    email = Column(sa.String(80), nullable=True)
+    username: Mapped[str] = mapped_column(sa.String(80), unique=True, nullable=False)
+    email: Mapped[str] = mapped_column(sa.String(80), nullable=True)
     # _password = Column("password", db.LargeBinary(128), nullable=True)
-    _password = Column("password", sa.String(128), nullable=True)
-    first_name = Column(sa.String(30), nullable=True)
-    last_name = Column(sa.String(30), nullable=True)
-    active = Column(sa.Boolean(), default=False)
+    _password: Mapped[str] = mapped_column("password", sa.String(128), nullable=True)
+    first_name: Mapped[str] = mapped_column(sa.String(30), nullable=True)
+    last_name: Mapped[str] = mapped_column(sa.String(30), nullable=True)
+    active: Mapped[bool] = mapped_column(sa.Boolean(), default=False)
 
-    roles = relationship(
-        "Role",
+    download_logs: Mapped[List["DownloadLog"]] = relationship(
+        back_populates="user"
+    )  # type:ignore
+
+    roles: Mapped[List["Role"]] = relationship(
+        back_populates="users",
         secondary=third_role_users,
-        backref=db.backref("users"),  # lazy="dynamic"
-    )
+        uselist=True
+    ) # type: ignore
 
     @hybrid_property
     def password(self):
@@ -81,3 +96,4 @@ class User(PkModel):
     def __repr__(self):
         """Represent instance as a unique sa.String."""
         return f"<User({self.username!r})>"
+

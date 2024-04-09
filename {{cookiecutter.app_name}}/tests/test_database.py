@@ -3,9 +3,8 @@
 import pytest
 from sqlalchemy import text
 from sqlalchemy.orm.exc import ObjectDeletedError
-
-from {{cookiecutter.app_name}}.database import Column, PkModel, db
 from {{cookiecutter.app_name}}.apps.models import User
+from {{cookiecutter.app_name}}.database import Column, PkModel, db
 
 ExampleUserModel = User
 

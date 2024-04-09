@@ -3,9 +3,6 @@
 
 from flask import request
 from flask.views import MethodView
-from sqlalchemy import select
-from sqlalchemy.orm import selectinload
-from sqlalchemy.exc import IntegrityError
 from flask_jwt_extended import (
     create_access_token,
     create_refresh_token,
@@ -14,16 +11,16 @@ from flask_jwt_extended import (
     get_jwt_identity,
     jwt_required,
 )
-
+from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import selectinload
+from {{cookiecutter.app_name}}.apps import models
+from {{cookiecutter.app_name}}.apps.user import schemas
 from {{cookiecutter.app_name}}.extensions import db
 from {{cookiecutter.app_name}}.initialization.exception import CODE
 from {{cookiecutter.app_name}}.utils.http import json_response
 from {{cookiecutter.app_name}}.utils.wtf import validators
 from {{cookiecutter.app_name}}.utils.wtf.parser import Argument, JsonParser
-
-from {{cookiecutter.app_name}}.apps import models
-from {{cookiecutter.app_name}}.apps.user import schemas
-
 
 
 class RegisterView(MethodView):

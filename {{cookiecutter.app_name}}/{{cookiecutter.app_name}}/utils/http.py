@@ -11,7 +11,6 @@ import uuid
 from flask import jsonify
 from flask.json.provider import DefaultJSONProvider
 from sqlalchemy.engine.result import ScalarResult
-
 from {{cookiecutter.app_name}}.database import PkModel
 from {{cookiecutter.app_name}}.initialization.exception import CODE
 

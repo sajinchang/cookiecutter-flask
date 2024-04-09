@@ -10,7 +10,6 @@ import os
 from typing import Any
 
 from celery.signals import worker_process_init
-
 from {{cookiecutter.app_name}}.app import create_app
 from {{cookiecutter.app_name}}.extensions import celery_app, db, set_logger
 

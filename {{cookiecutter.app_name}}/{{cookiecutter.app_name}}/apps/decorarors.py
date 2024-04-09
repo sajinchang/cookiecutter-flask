@@ -1,7 +1,6 @@
 from functools import wraps
 
 from flask_jwt_extended import get_jwt, verify_jwt_in_request
-
 from {{cookiecutter.app_name}}.initialization.exception import CODE
 from {{cookiecutter.app_name}}.utils.http import json_response
 

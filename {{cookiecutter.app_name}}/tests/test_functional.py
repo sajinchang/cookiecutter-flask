@@ -5,7 +5,6 @@ See: http://webtest.readthedocs.org/
 """
 import json
 
-
 from {{cookiecutter.app_name}}.apps.models import User
 from {{cookiecutter.app_name}}.initialization.exception import CODE
 

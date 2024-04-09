@@ -3,7 +3,6 @@
 import datetime as dt
 
 import pytest
-
 from {{cookiecutter.app_name}}.apps.models import Role, User
 
 from .factories import UserFactory

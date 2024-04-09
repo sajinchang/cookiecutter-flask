@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 """ urls """
 
-from flask import Flask, Blueprint
-
+from flask import Blueprint, Flask
 from {{cookiecutter.app_name}}.apps.user import views as user_views
 from {{cookiecutter.app_name}}.public import views as public_views
 

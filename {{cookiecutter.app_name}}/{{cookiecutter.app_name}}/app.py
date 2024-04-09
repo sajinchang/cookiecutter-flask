@@ -5,7 +5,6 @@ import logging
 import os
 
 from flask import Flask
-
 from {{cookiecutter.app_name}}.initialization import FlaskAppInitializer
 
 logger = logging.getLogger(__name__)

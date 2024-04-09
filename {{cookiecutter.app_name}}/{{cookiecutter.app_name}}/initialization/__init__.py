@@ -10,7 +10,6 @@ import pathlib
 from typing import Any
 
 from flask.logging import default_handler
-
 from {{cookiecutter.app_name}} import commands
 from {{cookiecutter.app_name}}.extensions import (
     APP_DIR,
@@ -19,11 +18,13 @@ from {{cookiecutter.app_name}}.extensions import (
     celery_app,
     db,
     debug_toolbar,
+    jwt_manager,
     migrate,
     set_logger,
-    jwt_manager
 )
+
 from .urls import make_urls
+
 
 def close_request_session(response):
     # 解决mysql server gone away

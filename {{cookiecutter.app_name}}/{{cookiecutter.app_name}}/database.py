@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 """Database module, including the SQLAlchemy database object and DB-related utilities."""
-from importlib.metadata import version
 from typing import Optional, Type, TypeVar, Any
 
 import sqlalchemy as sa
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Mapped, Session, mapped_column
+from sqlalchemy.orm import Session, mapped_column
 from sqlalchemy.orm.properties import MappedColumn
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -53,8 +52,19 @@ class ExtendMixin(object):
             return obj, True
 
     @classmethod
+    def get(
+        cls,
+        session: Optional[Session] = None,
+        **kwargs,
+    ):
+        session = session or db.session  # type: ignore
+        stmt = sa.select(cls).where(*[getattr(cls, k) == v for k, v in kwargs.items()])
+        obj = session.execute(stmt).scalar_one_or_none()  # type: ignore
+        return obj
+
+    @classmethod
     def get_or_create(
-        cls, session: Session = None, defaults: Optional[dict] = None, **kwargs
+        cls, session: Optional[Session] = None, defaults: Optional[dict] = None, **kwargs
     ):
         """
         get_or_create _summary_
@@ -82,7 +92,7 @@ class ExtendMixin(object):
             return cls._create_object_from_params(session, kwargs, params)
 
     @classmethod
-    def update_or_create(cls, session:Session=None, defaults=None, **kwargs):
+    def update_or_create(cls, session=None, defaults=None, **kwargs):
         session = session or db.session
         defaults = defaults or {}
         with session.begin_nested():

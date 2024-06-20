@@ -1,18 +1,13 @@
 # -*- coding: utf-8 -*-
 """models."""
 
+from typing import List
 
 import sqlalchemy as sa
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, mapped_column
 
-from {{cookiecutter.app_name}}.database import (
-    Column,
-    PkModel,
-    db,
-    reference_col,
-    relationship,
-)
+from {{cookiecutter.app_name}}.database import Column, PkModel, db, relationship
 from {{cookiecutter.app_name}}.extensions import bcrypt
 
 third_role_users = db.Table(
@@ -39,7 +34,7 @@ class Role(PkModel):
         back_populates="roles",
         secondary=third_role_users,
         uselist=True
-    ) # type: ignore
+    )  # type: ignore
 
     def __init__(self, name, **kwargs):
         """Create instance."""
@@ -62,15 +57,11 @@ class User(PkModel):
     last_name: Mapped[str] = mapped_column(sa.String(30), nullable=True)
     active: Mapped[bool] = mapped_column(sa.Boolean(), default=False)
 
-    download_logs: Mapped[List["DownloadLog"]] = relationship(
-        back_populates="user"
-    )  # type:ignore
-
     roles: Mapped[List["Role"]] = relationship(
         back_populates="users",
         secondary=third_role_users,
         uselist=True
-    ) # type: ignore
+    )  # type: ignore
 
     @hybrid_property
     def password(self):

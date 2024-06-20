@@ -2,19 +2,19 @@
 
 # Flask
 click>=7.0
-Flask==2.3.2
-Werkzeug==2.3.6
+Flask==3.0.3
+Werkzeug==3.0.3
 
 # Database
 Flask-SQLAlchemy==3.0.5
 PyMySQL==1.1.0
-SQLAlchemy==2.0.19
+SQLAlchemy==2.0.31
 
 # cors
 Flask-Cors==4.0.0
 
 # Migrations
-Flask-Migrate==4.0.4
+Flask-Migrate==4.0.7
 
 # Forms
 email-validator==2.0.0.post2
@@ -33,18 +33,18 @@ Flask-JWT-Extended==4.6.0
 
 # Caching
 Flask-Caching>=2.0.2
-redis==4.6.0
+redis==5.0.6
 
 # marshmallow
-marshmallow==3.20.1
-marshmallow-sqlalchemy==0.29.0
+marshmallow==3.21.3
+marshmallow-sqlalchemy==0.30.0
 
 # Debug toolbar
-Flask-DebugToolbar==0.13.1
+Flask-DebugToolbar==0.14.1
 
 # Environment variable parsing
-environs==9.5.0
+environs==11.0.0
 
 # celery
-celery==5.3.1
-flower==2.0.0
+celery==5.4.0
+flower==2.0.1

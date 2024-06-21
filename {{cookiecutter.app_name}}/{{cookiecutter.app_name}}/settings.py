@@ -13,6 +13,7 @@ from urllib.parse import quote_plus
 from celery.schedules import crontab  # type: ignore
 from dotenv import find_dotenv, load_dotenv  # !!! 解决 celery 无法加载环境变量的问题
 
+load_dotenv(find_dotenv())
 
 def get_env_variable(var_name: str, default: Optional[str] = None) -> str:
     """Get the environment variable or raise exception."""

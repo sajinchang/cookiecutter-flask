@@ -6,9 +6,9 @@ import os
 LOG_DIR = os.getenv("LOG_DIR", os.path.join(os.path.expanduser("~"), "logs", "{{cookiecutter.app_name}}"))
 os.makedirs(LOG_DIR, exist_ok=True)
 
-from celery.schedules import crontab  # type: ignore
 from dotenv import find_dotenv, load_dotenv  # !!! 解决 celery 无法加载环境变量的问题
 
+load_dotenv(find_dotenv())
 
 class GunicornConfig(object):
     workers = 2

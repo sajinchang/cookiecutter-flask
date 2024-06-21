@@ -10,7 +10,8 @@ import os
 from typing import Dict, Optional
 from urllib.parse import quote_plus
 
-from celery.schedules import crontab
+from celery.schedules import crontab  # type: ignore
+from dotenv import find_dotenv, load_dotenv  # !!! 解决 celery 无法加载环境变量的问题
 
 
 def get_env_variable(var_name: str, default: Optional[str] = None) -> str:

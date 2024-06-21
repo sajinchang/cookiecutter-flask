@@ -87,7 +87,7 @@ class FlaskAppInitializer(object):  # pylint: disable=too-many-public-methods
     def shell_init(self):
         @self.flask_app.shell_context_processor
         def make_shell_context():
-            from {{cookiecutter.app_name}}.apps.user.models import Role, User
+            from {{cookiecutter.app_name}}.apps.models import Role, User
 
             return locals()
 

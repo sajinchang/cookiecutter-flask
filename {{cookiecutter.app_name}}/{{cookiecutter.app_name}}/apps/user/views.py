@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """User views."""
 
-from flask import request
+from flask import request, current_app
 from flask.views import MethodView
 from flask_jwt_extended import (
     create_access_token,
@@ -19,7 +19,6 @@ from {{cookiecutter.app_name}}.apps.user import schemas
 from {{cookiecutter.app_name}}.extensions import db
 from {{cookiecutter.app_name}}.initialization.exception import CODE
 from {{cookiecutter.app_name}}.utils.http import json_response
-from {{cookiecutter.app_name}}.utils.wtf import validators
 from {{cookiecutter.app_name}}.utils.wtf.parser import Argument, JsonParser
 
 

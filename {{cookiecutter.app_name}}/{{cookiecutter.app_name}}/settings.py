@@ -61,6 +61,10 @@ SQLALCHEMY_DATABASE_URI = "%s://%s:%s@%s:%s/%s" % (
     DATABASE_DB,
 )
 
+if DEBUG:
+    # SET TRUE FOR FLASK DEBUG-TOOL-BAR
+    SQLALCHEMY_RECORD_QUERIES = True
+
 SQLALCHEMY_ENGINE_OPTIONS = {"pool_size": 20, "pool_recycle": 600, "pool_pre_ping": True,
                               "isolation_level": "READ COMMITTED"}
 
